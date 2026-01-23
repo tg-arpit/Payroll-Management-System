@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="card">
+    <h2 style="color: #667eea; margin-bottom: 10px;">👋 Welcome, Admin!</h2>
+    <p style="color: #666;">Here's what's happening in your organization today.</p>
+</div>
+
+<!-- Stats Cards -->
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+    <!-- Total Employees -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);">
+        <h3 style="font-size: 48px; margin-bottom: 10px;">{{ stats.total_employees }}</h3>
+        <p style="font-size: 16px;">Total Employees</p>
+    </div>
+    
+    <!-- Active Employees -->
+    <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);">
+        <h3 style="font-size: 48px; margin-bottom: 10px;">{{ stats.active_employees }}</h3>
+        <p style="font-size: 16px;">Active Employees</p>
+    </div>
+    
+    <!-- Inactive Employees -->
+    <div style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 5px 20px rgba(220, 53, 69, 0.3);">
+        <h3 style="font-size: 48px; margin-bottom: 10px;">{{ stats.inactive_employees }}</h3>
+        <p style="font-size: 16px;">Inactive Employees</p>
+    </div>
+    
+    <!-- Departments -->
+    <div style="background: linear-gradient(135deg, #ffc107 0%, #ff6b6b 100%); color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 5px 20px rgba(255, 193, 7, 0.3);">
+        <h3 style="font-size: 48px; margin-bottom: 10px;">{{ stats.departments|length }}</h3>
+        <p style="font-size: 16px;">Departments</p>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <h3 style="margin-bottom: 20px; color: #667eea;">⚡ Quick Actions</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+        <!-- Add Employee -->
+        <a href="{{ url_for('admin_add_employee') }}" 
+           style="text-decoration: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; transition: transform 0.3s;">
+            <div style="font-size: 42px; margin-bottom: 10px;">👤➕</div>
+            <div style="font-size: 16px; font-weight: 500;">Add Employee</div>
+        </a>
+        
+        <!-- Mark Attendance -->
+        <a href="{{ url_for('admin_mark_attendance') }}" 
+           style="text-decoration: none; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; transition: transform 0.3s;">
+            <div style="font-size: 42px; margin-bottom: 10px;">📅✓</div>
+            <div style="font-size: 16px; font-weight: 500;">Mark Attendance</div>
+        </a>
+        
+        <!-- Process Payroll -->
+        <a href="{{ url_for('admin_process_payroll') }}" 
+           style="text-decoration: none; background: linear-gradient(135deg, #ffc107 0%, #ff6b6b 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; transition: transform 0.3s;">
+            <div style="font-size: 42px; margin-bottom: 10px;">💰</div>
+            <div style="font-size: 16px; font-weight: 500;">Process Payroll</div>
+        </a>
+        
+        <!-- View Attendance -->
+        <a href="{{ url_for('admin_attendance') }}" 
+           style="text-decoration: none; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; transition: transform 0.3s;">
+            <div style="font-size: 42px; margin-bottom: 10px;">📊</div>
+            <div style="font-size: 16px; font-weight: 500;">View Attendance</div>
+        </a>
+    </div>
+</div>
+
+<!-- Department Distribution -->
+{% if stats.departments %}
+<div class="card">
+    <h3 style="margin-bottom: 20px; color: #667eea;">🏢 Department Distribution</h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        {% for dept, count in stats.departments.items() %}
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea;">
+            <div style="font-size: 28px; font-weight: bold; color: #667eea; margin-bottom: 5px;">{{ count }}</div>
+            <div style="color: #666; font-size: 14px;">{{ dept }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Monthly Payroll Trends -->
+{% if stats.monthly_payroll %}
+<div class="card">
+    <h3 style="margin-bottom: 20px; color: #667eea;">💰 Monthly Payroll Trends</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Total Employees</th>
+                <th>Total Payout</th>
+                <th>Average Salary</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in stats.monthly_payroll %}
+            <tr>
+                <td><strong>{{ record.month }}</strong></td>
+                <td>{{ record.emp_count }}</td>
+                <td><strong style="color: #28a745;">₹{{ "%.2f"|format(record.total_payout) }}</strong></td>
+                <td>₹{{ "%.2f"|format(record.total_payout / record.emp_count) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Recent Admin Activities -->
+{% if logs %}
+<div class="card">
+    <h3 style="margin-bottom: 20px; color: #667eea;">📋 Recent Admin Activities</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Action</th>
+                <th>Description</th>
+                <th>IP Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.timestamp.strftime('%d-%m-%Y %H:%M') }}</td>
+                <td>
+                    <span style="background: #e7f3ff; color: #667eea; padding: 5px 10px; border-radius: 5px; font-size: 12px;">
+                        {{ log.action_type }}
+                    </span>
+                </td>
+                <td>{{ log.description }}</td>
+                <td style="font-family: monospace; font-size: 12px;">{{ log.ip_address }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<style>
+    /* Hover effect for quick actions */
+    a[style*="transition"]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

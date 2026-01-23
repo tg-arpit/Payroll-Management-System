@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2 style="color: #667eea;">📅 Attendance Management</h2>
+        
+        <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+            <label>Month:</label>
+            <input type="month" 
+                   name="month" 
+                   value="{{ month }}" 
+                   style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+            <button type="submit" class="btn btn-primary" style="padding: 8px 16px;">Filter</button>
+        </form>
+    </div>
+    
+    {% if attendance_data %}
+    <table>
+        <thead>
+            <tr>
+                <th>Emp ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Days Present</th>
+                <th>Total Days</th>
+                <th>Attendance %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in attendance_data %}
+            {% set year, mon = month.split('-') %}
+            {% set total_days = 30 %}  {# Simplified - use calendar.monthrange in production #}
+            {% set attendance_percent = (data.days_present / total_days * 100) if total_days > 0 else 0 %}
+            <tr>
+                <td><strong>{{ data.employee.emp_id }}</strong></td>
+                <td>{{ data.employee.name }}</td>
+                <td>{{ data.employee.department or 'N/A' }}</td>
+                <td>{{ data.days_present }}</td>
+                <td>{{ total_days }}</td>
+                <td>
+                    {% if attendance_percent >= 90 %}
+                        <span style="color: #28a745; font-weight: bold;">{{ "%.1f"|format(attendance_percent) }}%</span>
+                    {% elif attendance_percent >= 75 %}
+                        <span style="color: #ffc107; font-weight: bold;">{{ "%.1f"|format(attendance_percent) }}%</span>
+                    {% else %}
+                        <span style="color: #dc3545; font-weight: bold;">{{ "%.1f"|format(attendance_percent) }}%</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 50px; color: #999;">
+        <h3>No attendance data for this month</h3>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}My Payslips{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #667eea; margin-bottom: 30px;">💳 My Payslips</h2>
+    
+    {% if payslips %}
+    <table>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Gross Salary</th>
+                <th>Deductions</th>
+                <th>Net Salary</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payslip in payslips %}
+            <tr>
+                <td><strong>{{ payslip.month }}</strong></td>
+                <td>₹{{ "%.2f"|format(payslip.gross_salary) }}</td>
+                <td style="color: #dc3545;">₹{{ "%.2f"|format(payslip.total_deductions) }}</td>
+                <td><strong style="color: #28a745; font-size: 16px;">₹{{ "%.2f"|format(payslip.net_salary) }}</strong></td>
+                <td>{{ payslip.payment_date.strftime('%d-%m-%Y') if payslip.payment_date else '-' }}</td>
+                <td>
+                    {% if payslip.status == 'Paid' %}
+                        <span style="background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 5px;">
+                            ✓ Paid
+                        </span>
+                    {% elif payslip.status == 'Pending' %}
+                        <span style="background: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 5px;">
+                            ⏳ Pending
+                        </span>
+                    {% else %}
+                        <span style="background: #f8d7da; color: #721c24; padding: 5px 10px; border-radius: 5px;">
+                            ✗ Failed
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('download_payslip', trans_id=payslip.trans_id) }}" 
+                       class="btn btn-primary" 
+                       style="padding: 6px 12px; font-size: 14px;">
+                        📥 Download PDF
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 50px; color: #999;">
+        <h3>📭 No payslips available</h3>
+        <p>Your payslips will appear here once processed by admin</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

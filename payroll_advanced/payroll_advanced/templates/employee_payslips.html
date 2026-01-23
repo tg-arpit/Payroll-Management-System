@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}My Payslips{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #667eea; margin-bottom: 30px;">💳 My Salary Slips</h2>
+    
+    {% if payslips %}
+    <div style="margin-bottom: 20px; padding: 15px; background: #e7f3ff; border-radius: 5px;">
+        <strong>ℹ️ Total Payslips:</strong> {{ payslips|length }}
+    </div>
+    
+    <!-- Payslip Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+        {% for payslip in payslips %}
+        <div style="border: 2px solid #ddd; border-radius: 10px; padding: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <!-- Header -->
+            <div style="border-bottom: 2px solid #667eea; padding-bottom: 15px; margin-bottom: 15px;">
+                <h3 style="color: #667eea; margin-bottom: 5px;">{{ payslip.month }}</h3>
+                <p style="color: #666; font-size: 14px;">Transaction ID: #{{ payslip.trans_id }}</p>
+            </div>
+            
+            <!-- Salary Breakdown -->
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Base Salary:</span>
+                    <strong>₹{{ "%.2f"|format(payslip.base_salary) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #28a745;">
+                    <span>+ HRA:</span>
+                    <strong>₹{{ "%.2f"|format(payslip.hra) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #28a745;">
+                    <span>+ Bonus:</span>
+                    <strong>₹{{ "%.2f"|format(payslip.bonus) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
+                    <span>Gross Salary:</span>
+                    <strong style="color: #667eea;">₹{{ "%.2f"|format(payslip.gross_salary) }}</strong>
+                </div>
+            </div>
+            
+            <!-- Deductions -->
+            <div style="margin-bottom: 15px; padding: 10px; background: #fff3cd; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color: #856404;">- EPF:</span>
+                    <strong style="color: #dc3545;">₹{{ "%.2f"|format(payslip.epf_deduction) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="color: #856404;">- TDS:</span>
+                    <strong style="color: #dc3545;">₹{{ "%.2f"|format(payslip.tds_deduction) }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #856404;">- LOP:</span>
+                    <strong style="color: #dc3545;">₹{{ "%.2f"|format(payslip.lop_deduction) }}</strong>
+                </div>
+            </div>
+            
+            <!-- Net Salary -->
+            <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 16px;">Net Salary:</span>
+                    <strong style="font-size: 24px;">₹{{ "%.2f"|format(payslip.net_salary) }}</strong>
+                </div>
+            </div>
+            
+            <!-- Attendance Info -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #666;">
+                <span>Days Present: <strong>{{ payslip.days_present }}</strong></span>
+                <span>Total Days: <strong>{{ payslip.total_days }}</strong></span>
+            </div>
+            
+            <!-- Actions -->
+            <a href="{{ url_for('download_payslip', trans_id=payslip.trans_id) }}" 
+               class="btn btn-primary" 
+               style="width: 100%; text-align: center;">
+                📄 Download PDF
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 50px; color: #999;">
+        <h3>No payslips available yet</h3>
+        <p>Your payslips will appear here once payroll is processed</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

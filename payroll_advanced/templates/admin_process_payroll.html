@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Process Payroll{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="color: #667eea; margin-bottom: 30px; text-align: center;">💰 Process Monthly Payroll</h2>
+        
+        <div style="background: #fff3cd; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+            <h3 style="margin-bottom: 15px;">⚠️ Important:</h3>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>This will calculate salary for ALL active employees</li>
+                <li>Salary will be based on attendance records</li>
+                <li>PDF payslips will be generated automatically</li>
+                <li>Emails will be sent to all employees</li>
+                <li>This process cannot be undone</li>
+            </ul>
+        </div>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>📅 Select Month</label>
+                <input type="month" 
+                       name="month" 
+                       value="{{ current_month }}" 
+                       required
+                       style="text-align: center; font-size: 18px;">
+            </div>
+            
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <strong>📊 Calculation Formula:</strong><br><br>
+                <strong>Net Salary =</strong> (Base Salary / Total Days × Days Present) + HRA + Bonus - EPF - TDS - LOP
+                <br><br>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>EPF: 12% of base salary</li>
+                    <li>TDS: Based on income tax slabs</li>
+                    <li>HRA: 40% of base salary</li>
+                    <li>Bonus: 5% of base salary</li>
+                    <li>LOP: Loss of Pay for absent days</li>
+                </ul>
+            </div>
+            
+            <button type="submit" 
+                    class="btn btn-success" 
+                    style="width: 100%; padding: 15px; font-size: 18px;"
+                    onclick="return confirm('Process payroll for all employees? This action cannot be undone.')">
+                💸 Process Payroll
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP - Payroll System{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 50px auto;">
+    <div class="card">
+        <h2 style="text-align: center; color: #667eea; margin-bottom: 30px;">🔐 OTP Verification</h2>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <p style="color: #666; font-size: 16px;">
+                We've sent a 6-digit OTP to your email.<br>
+                Please enter it below to verify your {{ purpose }}.
+            </p>
+        </div>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label style="text-align: center; display: block;">Enter OTP</label>
+                <input type="text" 
+                       name="otp" 
+                       required 
+                       maxlength="6" 
+                       pattern="[0-9]{6}"
+                       placeholder="000000"
+                       style="text-align: center; font-size: 24px; letter-spacing: 10px;">
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Verify OTP</button>
+        </form>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; text-align: center;">
+            <strong>⏰ OTP expires in 10 minutes</strong><br>
+            <small style="color: #856404;">Didn't receive? Check spam folder or try again.</small>
+        </div>
+    </div>
+</div>
+{% endblock %}
