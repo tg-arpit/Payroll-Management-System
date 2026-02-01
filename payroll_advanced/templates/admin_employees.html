@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h2 style="color: #667eea; margin-bottom: 10px;">👥 Employee Management</h2>
+            <p style="color: #666;">Total Employees: <strong>{{ employees|length }}</strong></p>
+        </div>
+        
+        <a href="{{ url_for('admin_add_employee') }}" class="btn btn-success">
+            ➕ Add Employee
+        </a>
+    </div>
+    
+    <!-- Stats -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+        <div style="background: #28a745; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 32px;">{{ employees|selectattr('status', 'equalto', 'Active')|list|length }}</h3>
+            <p>Active</p>
+        </div>
+        <div style="background: #dc3545; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 32px;">{{ employees|selectattr('status', 'equalto', 'Inactive')|list|length }}</h3>
+            <p>Inactive</p>
+        </div>
+        <div style="background: #17a2b8; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 32px;">{{ employees|selectattr('role', 'equalto', 'admin')|list|length }}</h3>
+            <p>Admins</p>
+        </div>
+    </div>
+    
+    <!-- Employee Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Emp ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Salary</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            <tr>
+                <td><strong>{{ emp.emp_id }}</strong></td>
+                <td>{{ emp.name }}</td>
+                <td>{{ emp.email }}</td>
+                <td>{{ emp.department or 'N/A' }}</td>
+                <td>{{ emp.designation or 'N/A' }}</td>
+                <td>₹{{ "%.2f"|format(emp.base_salary) }}</td>
+                <td>
+                    {% if emp.status == 'Active' %}
+                        <span style="background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 5px;">
+                            ✓ Active
+                        </span>
+                    {% else %}
+                        <span style="background: #f8d7da; color: #721c24; padding: 5px 10px; border-radius: 5px;">
+                            ✗ Inactive
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        {% if emp.status == 'Active' %}
+                            <a href="{{ url_for('admin_deactivate_employee', emp_id=emp.emp_id) }}" 
+                               class="btn btn-secondary"
+                               style="padding: 5px 10px; font-size: 12px;"
+                               onclick="return confirm('Deactivate {{ emp.name }}?')">
+                                Deactivate
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('admin_activate_employee', emp_id=emp.emp_id) }}" 
+                               class="btn btn-success"
+                               style="padding: 5px 10px; font-size: 12px;"
+                               onclick="return confirm('Activate {{ emp.name }}?')">
+                                Activate
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('admin_view_employee_attendance', emp_id=emp.emp_id) }}" 
+                           class="btn btn-primary"
+                           style="padding: 5px 10px; font-size: 12px;">
+                            View
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

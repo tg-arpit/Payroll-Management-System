@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}My Attendance{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="color: #667eea; margin-bottom: 20px;">📅 My Attendance Records</h2>
+        
+        <!-- Month Filter -->
+        <form method="GET" style="margin-bottom: 30px;">
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <label style="font-weight: bold;">Select Month:</label>
+                <input type="month" 
+                       name="month" 
+                       value="{{ month }}" 
+                       class="form-control" 
+                       style="max-width: 200px;"
+                       onchange="this.form.submit()">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+
+        <!-- Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">{{ summary.total_days }}</h3>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Total Days</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">{{ summary.present }}</h3>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Present</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">{{ summary.absent }}</h3>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Absent</p>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3 style="margin: 0; font-size: 32px;">{{ summary.leaves }}</h3>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">Leaves</p>
+            </div>
+        </div>
+
+        <!-- Attendance Table -->
+        {% if records %}
+        <div style="overflow-x: auto;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Status</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Working Hours</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <!-- Date -->
+                        <td>
+                            {% if record.date %}
+                                {{ record.date.strftime('%d-%b-%Y') if record.date.strftime else record.date }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Day of Week -->
+                        <td>
+                            {% if record.date %}
+                                {{ record.date.strftime('%A') if record.date.strftime else '-' }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Status with Colors -->
+                        <td>
+                            {% if record.status == 'Present' %}
+                                <span style="background: #28a745; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
+                                    ✓ Present
+                                </span>
+                            {% elif record.status == 'Absent' %}
+                                <span style="background: #dc3545; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
+                                    ✗ Absent
+                                </span>
+                            {% elif record.status == 'Leave' %}
+                                <span style="background: #ffc107; color: #333; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
+                                    📅 Leave
+                                </span>
+                            {% elif record.status == 'Half-Day' %}
+                                <span style="background: #17a2b8; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
+                                    ⏰ Half-Day
+                                </span>
+                            {% else %}
+                                <span style="background: #6c757d; color: white; padding: 5px 15px; border-radius: 20px;">
+                                    {{ record.status }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Check In Time - FIXED -->
+                        <td>
+                            {% if record.check_in_time %}
+                                {% if record.check_in_time is string %}
+                                    {{ record.check_in_time }}
+                                {% else %}
+                                    {# Handle timedelta object #}
+                                    {% set total_seconds = record.check_in_time.total_seconds() %}
+                                    {% set hours = (total_seconds // 3600)|int %}
+                                    {% set minutes = ((total_seconds % 3600) // 60)|int %}
+                                    {{ "%02d:%02d"|format(hours, minutes) }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Check Out Time - FIXED -->
+                        <td>
+                            {% if record.check_out_time %}
+                                {% if record.check_out_time is string %}
+                                    {{ record.check_out_time }}
+                                {% else %}
+                                    {# Handle timedelta object #}
+                                    {% set total_seconds = record.check_out_time.total_seconds() %}
+                                    {% set hours = (total_seconds // 3600)|int %}
+                                    {% set minutes = ((total_seconds % 3600) // 60)|int %}
+                                    {{ "%02d:%02d"|format(hours, minutes) }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Working Hours - FIXED -->
+                        <td>
+                            {% if record.check_in_time and record.check_out_time %}
+                                {# Convert both to total seconds #}
+                                {% if record.check_in_time is string %}
+                                    {% set in_parts = record.check_in_time.split(':') %}
+                                    {% set in_seconds = (in_parts[0]|int * 3600) + (in_parts[1]|int * 60) %}
+                                {% else %}
+                                    {% set in_seconds = record.check_in_time.total_seconds() %}
+                                {% endif %}
+                                
+                                {% if record.check_out_time is string %}
+                                    {% set out_parts = record.check_out_time.split(':') %}
+                                    {% set out_seconds = (out_parts[0]|int * 3600) + (out_parts[1]|int * 60) %}
+                                {% else %}
+                                    {% set out_seconds = record.check_out_time.total_seconds() %}
+                                {% endif %}
+                                
+                                {# Calculate difference #}
+                                {% set diff_seconds = out_seconds - in_seconds %}
+                                {% set work_hours = (diff_seconds // 3600)|int %}
+                                {% set work_mins = ((diff_seconds % 3600) // 60)|int %}
+                                
+                                <strong>{{ work_hours }}h {{ work_mins }}m</strong>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Remarks -->
+                        <td>{{ record.remarks if record.remarks else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px 20px; color: #999;">
+            <h3 style="color: #666;">No attendance records found for {{ month }}</h3>
+            <p>Your attendance will appear here once marked by admin.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Back Button -->
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ url_for('employee_dashboard') }}" class="btn btn-secondary">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.table thead th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+}
+
+.table tbody tr:hover {
+    background: #f8f9ff;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.form-control {
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+}
+</style>
+{% endblock %}

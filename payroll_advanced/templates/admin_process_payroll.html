@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Process Payroll{% endblock %}
+
+{% block page_header %}Process Payroll{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="card">
+        <h2 style="color: #667eea; margin-bottom: 30px; text-align: center;">
+            💰 Process Monthly Payroll
+        </h2>
+        
+        <!-- Important Notice -->
+        <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #f59e0b;">
+            <h3 style="margin-bottom: 15px; color: #92400e;">
+                ⚠️ Important:
+            </h3>
+            <ul style="margin-left: 20px; line-height: 1.8; color: #92400e;">
+                <li>This will calculate salary for ALL active employees</li>
+                <li>Salary will be based on attendance records</li>
+                <li>PDF payslips will be generated automatically</li>
+                <li>Pro-rata calculation for partial month attendance</li>
+                <li>This process cannot be undone</li>
+            </ul>
+        </div>
+        
+        <form method="POST">
+            <!-- Month Selection -->
+            <div class="form-group">
+                <label style="font-weight: 600; font-size: 15px;">📅 Select Month</label>
+                <input type="month" 
+                       name="month" 
+                       value="{{ current_month }}" 
+                       required
+                       style="text-align: center; font-size: 16px; padding: 12px;">
+            </div>
+            
+            <!-- Calculation Formula -->
+            <div style="background: #e7f3ff; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #3b82f6;">
+                <h3 style="margin-bottom: 15px; color: #1e40af;">
+                    📊 Calculation Formula (Industry Standard):
+                </h3>
+                
+                <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <strong style="font-size: 15px; color: #1e293b;">Net Salary =</strong> 
+                    <span style="color: #059669;">Earned Salary</span> + 
+                    <span style="color: #059669;">HRA</span> + 
+                    <span style="color: #059669;">Conveyance</span> - 
+                    <span style="color: #dc2626;">PF</span> - 
+                    <span style="color: #dc2626;">PT</span> - 
+                    <span style="color: #dc2626;">Tax</span>
+                </div>
+                
+                <div style="font-weight: 600; margin-bottom: 12px; color: #1e40af;">
+                    ✅ All components are proportional to days worked!
+                </div>
+                
+                <ul style="margin-left: 20px; line-height: 1.9; color: #1e40af;">
+                    <li><strong>Earned Salary:</strong> (Base × Days Present / Total Days)</li>
+                    <li><strong>HRA:</strong> (40% of Base) × Work Ratio</li>
+                    <li><strong>Conveyance:</strong> (₹1,600/month) × Work Ratio</li>
+                    <li><strong>PF:</strong> 4.8% of Earned Salary</li>
+                    <li><strong>PT:</strong> ₹200/month (proportional)</li>
+                    <li><strong>Tax:</strong> 2.5% of Earned Salary</li>
+                </ul>
+            </div>
+             <!-- Process Button -->
+            <button type="submit" 
+                    class="btn btn-success" 
+                    style="width: 100%; padding: 16px; font-size: 18px; font-weight: 600; border-radius: 10px;"
+                    onclick="return confirm('Process payroll for all employees? This action cannot be undone.')">
+                💸 Process Payroll for All
+            </button>
+        </form>
+        
+        <!-- Back Button -->
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('admin_dashboard') }}" 
+               class="btn btn-secondary"
+               style="padding: 12px 30px;">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-group input[type="month"] {
+        cursor: pointer;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

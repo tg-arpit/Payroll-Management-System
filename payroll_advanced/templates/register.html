@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Register - ePayroll System{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+    <div class="card">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #667eea; font-size: 32px; margin-bottom: 10px;">📝 Employee Registration</h1>
+            <p style="color: #666;">Create your account to get started</p>
+        </div>
+        
+        <form method="POST">
+            <!-- Full Name -->
+            <div class="form-group">
+                <label>👤 Full Name</label>
+                <input type="text" 
+                       name="name" 
+                       required 
+                       placeholder="Enter your full name"
+                       autocomplete="name">
+            </div>
+            
+            <!-- Email -->
+            <div class="form-group">
+                <label>📧 Email Address</label>
+                <input type="email" 
+                       name="email" 
+                       required 
+                       placeholder="Enter your email"
+                       autocomplete="email">
+            </div>
+            
+            <!-- Password -->
+            <div class="form-group">
+                <label>🔒 Password</label>
+                <input type="password" 
+                       name="password" 
+                       required 
+                       placeholder="Create a password"
+                       autocomplete="new-password"
+                       minlength="6">
+                <small style="color: #666; font-size: 12px;">Minimum 6 characters</small>
+            </div>
+            
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label>🔒 Confirm Password</label>
+                <input type="password" 
+                       name="confirm_password" 
+                       required 
+                       placeholder="Confirm your password"
+                       autocomplete="new-password"
+                       minlength="6">
+            </div>
+            
+            <!-- Submit -->
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Register
+            </button>
+        </form>
+        
+        <!-- Note -->
+        <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #667eea;">
+            <strong>ℹ️ Note:</strong> 
+            <ul style="margin: 10px 0 0 20px; font-size: 14px; line-height: 1.6;">
+                <li>You will be registered as an <strong>Employee</strong></li>
+                <li>Admin accounts are created by system administrators only</li>
+                <li>Your Employee ID will be generated automatically</li>
+            </ul>
+        </div>
+        
+        <!-- Login Link -->
+        <div style="text-align: center; margin-top: 25px; padding-top: 25px; border-top: 1px solid #e0e0e0;">
+            <p style="color: #666;">
+                Already have an account? 
+                <a href="{{ url_for('login') }}" style="color: #667eea; font-weight: 500; text-decoration: none;">
+                    Login here
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

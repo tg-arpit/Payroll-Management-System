@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Check Salary - {{ employee.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2 style="color: #667eea;">💰 Salary Calculation - {{ employee.name }}</h2>
+            <div style="display: flex; gap: 10px;">
+                <form method="GET" style="display: inline;">
+                    <input type="month" name="month" value="{{ month }}" 
+                           style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"
+                           onchange="this.form.submit()">
+                </form>
+                <a href="{{ url_for('admin_employees') }}" class="btn btn-secondary">← Back</a>
+            </div>
+        </div>
+
+        <!-- Employee Details -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <strong>👤 Employee ID:</strong> {{ employee.emp_id }}<br>
+                    <strong>📧 Email:</strong> {{ employee.email }}<br>
+                    <strong>📱 Phone:</strong> {{ employee.phone or 'N/A' }}
+                </div>
+                <div>
+                    <strong>🏢 Department:</strong> {{ employee.department }}<br>
+                    <strong>💼 Designation:</strong> {{ employee.designation }}<br>
+                    <strong>💵 Base Salary:</strong> ₹{{ "%.2f"|format(employee.base_salary) }}
+                </div>
+            </div>
+        </div>
+
+        {% if salary_data %}
+        <!-- Salary Breakdown -->
+        <div style="background: #e7f3ff; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">📊 Salary Breakdown for {{ month }}</h3>
+            
+            <table style="width: 100%; margin-bottom: 20px;">
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 10px;"><strong>Attendance</strong></td>
+                    <td style="padding: 10px; text-align: right;">
+                        <strong>{{ salary_data.days_present }} / {{ salary_data.total_days }} days</strong>
+                        <span style="color: #28a745; margin-left: 10px;">
+                            ({{ "%.1f"|format((salary_data.days_present / salary_data.total_days * 100) if salary_data.total_days > 0 else 0) }}%)
+                        </span>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Earnings -->
+            <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <h4 style="color: #155724; margin-bottom: 10px;">✅ Earnings</h4>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="padding: 5px;">Base Salary (Pro-rata)</td>
+                        <td style="text-align: right; padding: 5px;">
+                            ₹{{ "%.2f"|format(employee.base_salary * (salary_data.days_present / salary_data.total_days if salary_data.total_days > 0 else 0)) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">HRA (40% × Work Ratio)</td>
+                        <td style="text-align: right; padding: 5px;">+ ₹{{ "%.2f"|format(salary_data.hra) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Bonus (5% × Work Ratio)</td>
+                        <td style="text-align: right; padding: 5px;">+ ₹{{ "%.2f"|format(salary_data.bonus) }}</td>
+                    </tr>
+                    <tr style="border-top: 2px solid #155724; font-weight: bold;">
+                        <td style="padding: 10px;">Gross Salary</td>
+                        <td style="text-align: right; padding: 10px; font-size: 18px; color: #155724;">
+                            ₹{{ "%.2f"|format(salary_data.gross_salary) }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Deductions -->
+            <div style="background: #f8d7da; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                <h4 style="color: #721c24; margin-bottom: 10px;">❌ Deductions</h4>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="padding: 5px;">EPF (12% of Earned)</td>
+                        <td style="text-align: right; padding: 5px;">- ₹{{ "%.2f"|format(salary_data.epf_deduction) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">TDS (Income Tax)</td>
+                        <td style="text-align: right; padding: 5px;">- ₹{{ "%.2f"|format(salary_data.tds_deduction) }}</td>
+                    </tr>
+                    <tr style="border-top: 2px solid #721c24; font-weight: bold;">
+                        <td style="padding: 10px;">Total Deductions</td>
+                        <td style="text-align: right; padding: 10px; font-size: 18px; color: #721c24;">
+                            -₹{{ "%.2f"|format(salary_data.epf_deduction + salary_data.tds_deduction) }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Net Salary -->
+            <div style="background: #667eea; color: white; padding: 20px; border-radius: 5px; text-align: center;">
+                <h3 style="margin: 0; margin-bottom: 10px;">💵 NET SALARY</h3>
+                <div style="font-size: 32px; font-weight: bold;">
+                    ₹{{ "%.2f"|format(salary_data.net_salary) }}
+                </div>
+                <div style="margin-top: 10px; font-size: 14px; opacity: 0.9;">
+                    {% if salary_data.net_salary == 0 %}
+                        ⚠️ No work recorded for this month
+                    {% elif salary_data.days_present < salary_data.total_days / 2 %}
+                        ⚠️ Less than 50% attendance
+                    {% else %}
+                        ✅ Ready for processing
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculation Info -->
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <strong>ℹ️ Calculation Method:</strong>
+            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                <li><strong>Pro-rata:</strong> All components calculated proportional to days worked</li>
+                <li><strong>No LOP:</strong> No separate Loss of Pay deduction (already in pro-rata)</li>
+                <li><strong>Fair & Transparent:</strong> Pay only for actual work days</li>
+                <li><strong>Always Positive:</strong> Salary cannot be negative</li>
+            </ul>
+        </div>
+
+        <!-- Attendance Summary -->
+        <div style="margin-top: 30px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">📅 Attendance Details</h3>
+            {% if attendance_records %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records %}
+                    <tr>
+                        <td>{{ record.date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            {% if record.status == 'Present' %}
+                                <span style="color: #28a745;">✓ Present</span>
+                            {% elif record.status == 'Half-Day' %}
+                                <span style="color: #ffc107;">⊙ Half Day</span>
+                            {% elif record.status == 'Leave' %}
+                                <span style="color: #17a2b8;">✈ Leave</span>
+                            {% else %}
+                                <span style="color: #dc3545;">✗ Absent</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.check_in_time or '-' }}</td>
+                        <td>{{ record.check_out_time or '-' }}</td>
+                        <td>{{ record.remarks or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div style="text-align: center; padding: 30px; color: #999; background: #f8f9fa; border-radius: 5px;">
+                <h4>No attendance records found for {{ month }}</h4>
+                <p>Please mark attendance before processing payroll</p>
+            </div>
+            {% endif %}
+        </div>
+
+        {% else %}
+        <div style="text-align: center; padding: 50px; color: #999;">
+            <h3>❌ Cannot calculate salary</h3>
+            <p>No attendance data available for this month</p>
+            <a href="{{ url_for('admin_attendance') }}" class="btn btn-primary" style="margin-top: 20px;">
+                Go to Attendance
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

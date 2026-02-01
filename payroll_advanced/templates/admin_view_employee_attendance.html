@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Attendance Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h2 style="color: #667eea; margin-bottom: 10px;">📅 Attendance Details</h2>
+            <p style="color: #666;">{{ employee.name }} ({{ employee.emp_id }})</p>
+        </div>
+        <a href="{{ url_for('admin_attendance', month=month) }}" class="btn btn-secondary">← Back</a>
+    </div>
+    
+    <!-- Month Selector -->
+    <form method="GET" style="margin-bottom: 30px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <label>Select Month:</label>
+            <input type="month" name="month" value="{{ month }}" 
+                   style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <button type="submit" class="btn btn-primary">View</button>
+        </div>
+    </form>
+    
+    <!-- Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+        <div style="background: #28a745; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 28px;">{{ records|selectattr('status', 'equalto', 'Present')|list|length }}</h3>
+            <p>Present</p>
+        </div>
+        <div style="background: #dc3545; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 28px;">{{ records|selectattr('status', 'equalto', 'Absent')|list|length }}</h3>
+            <p>Absent</p>
+        </div>
+        <div style="background: #ffc107; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 28px;">{{ records|selectattr('status', 'equalto', 'Leave')|list|length }}</h3>
+            <p>Leaves</p>
+        </div>
+        <div style="background: #17a2b8; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 28px;">{{ records|selectattr('status', 'equalto', 'Half-Day')|list|length }}</h3>
+            <p>Half Days</p>
+        </div>
+    </div>
+    
+    <!-- Total Working Days -->
+    <div style="background: #667eea; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+        <strong style="font-size: 18px;">Total Effective Working Days: {{ days_present|round(1) }}</strong>
+    </div>
+    
+    <!-- Attendance Records -->
+    {% if records %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Status</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records|sort(attribute='date', reverse=true) %}
+            <tr>
+                <td><strong>{{ record.date }}</strong></td>
+                <td>{{ record.date.strftime('%A') }}</td>
+                <td>
+                    {% if record.status == 'Present' %}
+                        <span style="color: #28a745; font-weight: bold;">✓ Present</span>
+                    {% elif record.status == 'Absent' %}
+                        <span style="color: #dc3545; font-weight: bold;">✗ Absent</span>
+                    {% elif record.status == 'Leave' %}
+                        <span style="color: #ffc107; font-weight: bold;">📅 Leave</span>
+                    {% else %}
+                        <span style="color: #17a2b8; font-weight: bold;">⏰ Half-Day</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <strong style="color: #28a745;">{{ record.check_in_time or '-' }}</strong>
+                </td>
+                <td>
+                    <strong style="color: #dc3545;">{{ record.check_out_time or '-' }}</strong>
+                </td>
+                <td>{{ record.remarks or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 50px; color: #999;">
+        <h3>No attendance records for this month</h3>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

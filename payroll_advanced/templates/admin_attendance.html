@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h2 style="color: #667eea; margin-bottom: 10px;">📅 Attendance Management</h2>
+            <p style="color: #666; font-size: 14px;">
+                Viewing: <strong>{{ month }}</strong> | Total Employees: <strong>{{ attendance_data|length }}</strong>
+            </p>
+        </div>
+        
+        <a href="{{ url_for('admin_mark_attendance') }}" class="btn btn-success">
+            ➕ Mark Attendance
+        </a>
+    </div>
+    
+    <!-- Filter Form -->
+    <form method="GET" style="display: flex; gap: 15px; align-items: end; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <div style="flex: 1;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 500;">📅 Month:</label>
+            <input type="month" 
+                   name="month" 
+                   value="{{ month }}" 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        
+        <div style="flex: 1;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 500;">🏢 Department:</label>
+            <select name="department" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <option value="">All Departments</option>
+                <option value="Engineering" {% if department == 'Engineering' %}selected{% endif %}>Engineering</option>
+                <option value="Sales" {% if department == 'Sales' %}selected{% endif %}>Sales</option>
+                <option value="Marketing" {% if department == 'Marketing' %}selected{% endif %}>Marketing</option>
+                <option value="HR" {% if department == 'HR' %}selected{% endif %}>HR</option>
+                <option value="Finance" {% if department == 'Finance' %}selected{% endif %}>Finance</option>
+                <option value="Administration" {% if department == 'Administration' %}selected{% endif %}>Administration</option>
+                <option value="General" {% if department == 'General' %}selected{% endif %}>General</option>
+            </select>
+        </div>
+        
+        <div>
+            <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">
+                🔍 Filter
+            </button>
+        </div>
+    </form>
+    
+    <!-- Summary Cards -->
+    {% if attendance_data %}
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+        {% set total_present = attendance_data|sum(attribute='days_present') %}
+        {% set total_employees = attendance_data|length %}
+        {% set total_possible_days = total_employees * 30 %}
+        {% set avg_attendance = (total_present / total_possible_days * 100) if total_possible_days > 0 else 0 %}
+        
+        <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 32px; margin-bottom: 5px;">{{ total_present|round(1) }}</h3>
+            <p>Total Present Days</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 32px; margin-bottom: 5px;">{{ total_employees }}</h3>
+            <p>Total Employees</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #ffc107 0%, #ff6b6b 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 32px; margin-bottom: 5px;">{{ avg_attendance|round|int }}%</h3>
+            <p>Average Attendance</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="font-size: 32px; margin-bottom: 5px;">{{ (total_possible_days - total_present)|round|int }}</h3>
+            <p>Total Absent Days</p>
+        </div>
+    </div>
+    
+    <!-- Attendance Table -->
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Emp ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Days Present</th>
+                    <th>Total Days</th>
+                    <th>Attendance %</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in attendance_data %}
+                {% set total_days = 30 %}
+                {% set attendance_percent = (data.days_present / total_days * 100) if total_days > 0 else 0 %}
+                <tr>
+                    <td><strong>{{ data.employee.emp_id }}</strong></td>
+                    <td>{{ data.employee.name }}</td>
+                    <td>{{ data.employee.department or 'N/A' }}</td>
+                    <td><strong style="color: #28a745;">{{ data.days_present|round(1) }}</strong></td>
+                    <td>{{ total_days }}</td>
+                    <td>
+                        {% if attendance_percent >= 90 %}
+                            <span style="color: #28a745; font-weight: bold;">{{ "%.1f"|format(attendance_percent) }}%</span>
+                        {% elif attendance_percent >= 75 %}
+                            <span style="color: #ffc107; font-weight: bold;">{{ "%.1f"|format(attendance_percent) }}%</span>
+                        {% else %}
+                            <span style="color: #e22fe5; font-weight: bold;">{{ "%.1f"|format(attendance_percent) }}%</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin_view_employee_attendance', emp_id=data.employee.emp_id, month=month) }}" 
+                           class="btn btn-primary" 
+                           style="padding: 6px 12px; font-size: 14px;">
+                            👁️ View Details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 50px; color: #999;">
+        <h3>📭 No attendance data</h3>
+        <p>Start marking attendance to see records here</p>
+        <a href="{{ url_for('admin_mark_attendance') }}" class="btn btn-success" style="margin-top: 20px;">
+            ➕ Mark Attendance
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ePayroll Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Left Side - Branding */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 50px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .logo {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            opacity: 0.95;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .features {
+            list-style: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .features li::before {
+            content: '✓';
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Right Side - Login Form */
+        .right-panel {
+            flex: 1;
+            padding: 60px 50px;
+            background: #ffffff;
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .form-header p {
+            color: #718096;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 18px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label {
+            font-size: 14px;
+            color: #4a5568;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .forgot-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-link:hover {
+            color: #764ba2;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 16px;
+            color: #a0aec0;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-link {
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #764ba2;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .demo-credentials {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecf5 100%);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .demo-credentials strong {
+            color: #2d3748;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .demo-credentials p {
+            font-size: 13px;
+            color: #4a5568;
+            margin: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-credentials p::before {
+            content: '🔑';
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                padding: 40px 30px;
+            }
+
+            .right-panel {
+                padding: 40px 30px;
+            }
+
+            .logo {
+                font-size: 32px;
+            }
+
+            .form-header h2 {
+                font-size: 26px;
+            }
+        }
+
+        /* Loading Animation */
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-login.loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Panel - Branding -->
+        <div class="left-panel">
+            <div class="logo">
+                <div class="logo-icon">💼</div>
+                <span>ePayroll</span>
+            </div>
+            <div class="tagline">
+                Advanced Payroll Management System for Modern Organizations
+            </div>
+            <ul class="features">
+                <li>Automated Salary Processing</li>
+                <li>Real-time Attendance Tracking</li>
+                <li>Secure Employee Portal</li>
+                <li>Instant PDF Payslips</li>
+                <li>Comprehensive Reports</li>
+            </ul>
+        </div>
+
+        <!-- Right Panel - Login Form -->
+        <div class="right-panel">
+            <div class="form-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue to your dashboard</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {% if category == 'success' %}🎉{% elif category == 'error' %}❌{% else %}⚠️{% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" id="loginForm">
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📧</span>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               class="form-control" 
+                               placeholder="Enter your email"
+                               required 
+                               autocomplete="email">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="form-control" 
+                               placeholder="Enter your password"
+                               required 
+                               autocomplete="current-password">
+                    </div>
+                </div>
+
+                <!-- Remember & Forgot -->
+                <div class="form-options">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="{{ url_for('forgot_password') }}" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-login" id="loginBtn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <div class="register-link">
+                Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+            </div>
+
+            <!-- Demo Credentials -->
+            <div class="demo-credentials">
+                <strong>🎯 Demo Credentials</strong>
+                <p><strong>Admin:</strong> admin@payroll.com / admin123</p>
+                <p><strong>Employee:</strong> Register to create your account</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form submission handling with loading state
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            const btn = document.getElementById('loginBtn');
+            btn.classList.add('loading');
+            btn.textContent = 'Signing in';
+        });
+
+        // Auto-focus on email field
+        document.getElementById('email').focus();
+
+        // Add ripple effect on button click
+        document.querySelector('.btn-login').addEventListener('click', function(e) {
+            let ripple = document.createElement('span');
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+            ripple.style.width = ripple.style.height = '100px';
+            ripple.style.left = e.clientX - this.offsetLeft - 50 + 'px';
+            ripple.style.top = e.clientY - this.offsetTop - 50 + 'px';
+            ripple.style.animation = 'ripple 0.6s ease-out';
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    </script>
+</body>
+</html>
