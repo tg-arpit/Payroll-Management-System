@@ -1,4 +1,4 @@
-# Payroll Management System
+# Employee Payroll Management System
 
 A complete **Payroll Management System** built with **Python**, **Object-Oriented Programming (OOP)** principles, and **MySQL**. This project calculates employee salaries, manages deductions, stores employee records, and generates payslips. It is designed to be hosted on **GitHub** and run locally.
 
